@@ -1,729 +1,828 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareSync - Public File Sharing Platform</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        color: #333;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .header {
-        text-align: center;
-        margin-bottom: 40px;
-        color: white;
-      }
-
-      .header h1 {
-        font-size: 3rem;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .header p {
-        font-size: 1.2rem;
-        opacity: 0.9;
-      }
-
-      .upload-section {
-        background: white;
-        border-radius: 20px;
-        padding: 40px;
-        margin-bottom: 40px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-      }
-
-      .upload-zone {
-        border: 3px dashed #667eea;
-        border-radius: 15px;
-        padding: 60px 20px;
-        text-align: center;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        background: linear-gradient(45deg, #f8f9ff, #fff);
-      }
-
-      .upload-zone:hover,
-      .upload-zone.dragover {
-        border-color: #764ba2;
-        background: linear-gradient(45deg, #f0f4ff, #fff);
-        transform: translateY(-2px);
-      }
-
-      .upload-zone i {
-        font-size: 4rem;
-        color: #667eea;
-        margin-bottom: 20px;
-        display: block;
-      }
-
-      .upload-zone h3 {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-        color: #333;
-      }
-
-      .upload-zone p {
-        color: #666;
-        font-size: 1.1rem;
-      }
-
-      .file-input {
-        display: none;
-      }
-
-      .upload-progress {
-        display: none;
-        margin-top: 20px;
-      }
-
-      .progress-bar {
-        width: 100%;
-        height: 10px;
-        background: #eee;
-        border-radius: 5px;
-        overflow: hidden;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        width: 0%;
-        transition: width 0.3s ease;
-      }
-
-      .files-section {
-        background: white;
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-      }
-
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #f0f0f0;
-      }
-
-      .section-header h2 {
-        font-size: 2rem;
-        color: #333;
-      }
-
-      .refresh-btn {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-        font-size: 1rem;
-      }
-
-      .refresh-btn:hover {
-        transform: scale(1.05);
-      }
-
-      .file-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-      }
-
-      .file-card {
-        background: linear-gradient(135deg, #f8f9ff, #fff);
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #eee;
-      }
-
-      .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      }
-
-      .file-icon {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
-        color: #667eea;
-      }
-
-      .file-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-        color: #333;
-        word-break: break-word;
-      }
-
-      .file-meta {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 15px;
-      }
-
-      .file-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-        font-size: 0.9rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .btn-download {
-        background: linear-gradient(45deg, #4caf50, #45a049);
-        color: white;
-        flex: 1;
-        justify-content: center;
-      }
-
-      .btn-copy {
-        background: linear-gradient(45deg, #2196f3, #1976d2);
-        color: white;
-      }
-
-      .btn:hover {
-        transform: scale(1.05);
-      }
-
-      .empty-state {
-        text-align: center;
-        color: #666;
-        font-size: 1.2rem;
-        padding: 60px 20px;
-      }
-
-      .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 20px;
-        opacity: 0.5;
-      }
-
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        border-radius: 10px;
-        color: white;
-        font-weight: 500;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        z-index: 1000;
-      }
-
-      .notification.show {
-        transform: translateX(0);
-      }
-
-      .notification.success {
-        background: linear-gradient(45deg, #4caf50, #45a049);
-      }
-
-      .notification.error {
-        background: linear-gradient(45deg, #f44336, #d32f2f);
-      }
-
-      .loading {
-        display: none;
-        text-align: center;
-        padding: 40px;
-      }
-
-      .loader {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #667eea;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
 
-      @media (max-width: 768px) {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
         .header h1 {
-          font-size: 2rem;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .upload-section,
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(45deg, #f8f9ff, #fff);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #764ba2;
+            background: linear-gradient(45deg, #f0f4ff, #fff);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone i {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .upload-zone p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         .files-section {
-          padding: 20px;
-        }
-
-        .file-grid {
-          grid-template-columns: 1fr;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
         }
 
         .section-header {
-          flex-direction: column;
-          gap: 15px;
-          text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
         }
-      }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eee;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .file-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .file-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-copy {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-section, .files-section {
+                padding: 20px;
+            }
+            
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <div class="header">
-        <h1><i class="fas fa-cloud-upload-alt"></i> ShareSync</h1>
-        <p>Share files instantly with anyone, anywhere in the world</p>
-      </div>
-
-      <div class="upload-section">
-        <div
-          class="upload-zone"
-          onclick="document.getElementById('fileInput').click()"
-        >
-          <i class="fas fa-cloud-upload-alt"></i>
-          <h3>Drop files here or click to upload</h3>
-          <p>Supports all file types • Max 50MB per file</p>
-          <input type="file" id="fileInput" class="file-input" multiple />
+        <div class="header">
+            <h1><i class="fas fa-cloud-upload-alt"></i> ShareSync</h1>
+            <p>Share files instantly with anyone, anywhere in the world</p>
         </div>
 
-        <div class="upload-progress">
-          <div class="progress-bar">
-            <div class="progress-fill"></div>
-          </div>
-          <p style="margin-top: 10px; text-align: center; color: #666">
-            Uploading...
-          </p>
-        </div>
-      </div>
-
-      <div class="files-section">
-        <div class="section-header">
-          <h2><i class="fas fa-folder-open"></i> Shared Files</h2>
-          <button class="refresh-btn" onclick="loadFiles()">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
+        <div class="upload-section">
+            <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drop files here or click to upload</h3>
+                <p>Supports all file types • Max 50MB per file</p>
+                <input type="file" id="fileInput" class="file-input" multiple>
+            </div>
+            
+            <div class="upload-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p style="margin-top: 10px; text-align: center; color: #666;">Uploading...</p>
+            </div>
         </div>
 
-        <div class="loading">
-          <div class="loader"></div>
-          <p>Loading files...</p>
+        <div class="files-section">
+            <div class="section-header">
+                <h2><i class="fas fa-folder-open"></i> Shared Files</h2>
+                <button class="refresh-btn" onclick="loadFiles()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="loading">
+                <div class="loader"></div>
+                <p>Loading files...</p>
+            </div>
+            
+            <div class="file-grid" id="fileGrid">
+                <!-- Files will be loaded here -->
+            </div>
         </div>
-
-        <div class="file-grid" id="fileGrid">
-          <!-- Files will be loaded here -->
-        </div>
-      </div>
     </div>
 
     <div class="notification" id="notification"></div>
 
     <!-- Supabase JavaScript SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.0/index.umd.min.js"></script>
-
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
     <script>
-      import { createClient } from "@supabase/supabase-js";
+        // 🔧 SUPABASE CONFIGURATION - Update these with your Supabase project details
+        const SUPABASE_URL = 'https://vbvlirmuwrfqispfagxr.supabase.co'; // Replace with your Supabase URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZidmxpcm11d3JmcWlzcGZhZ3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NzU2NjYsImV4cCI6MjA3NDU1MTY2Nn0.SOqjVVrixjCBJim_6cTAtRu4zu-c-Zu5MhP3NLIrQaE'; // Replace with your Supabase anon key
+        
+        let supabase = null;
+        let files = [];
+        let isSupabaseEnabled = false;
+        
+        // Initialize Supabase client with error handling
+        function initializeSupabase() {
+            try {
+                // Check if Supabase is available globally
+                if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    isSupabaseEnabled = true;
+                    return true;
+                } else if (typeof createClient !== 'undefined') {
+                    // Alternative way if createClient is available directly
+                    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    isSupabaseEnabled = true;
+                    return true;
+                } else {
+                    console.warn('Supabase library not loaded properly, using localStorage fallback');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Supabase initialization error:', error);
+                return false;
+            }
+        }
+        
+        // File upload handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.querySelector('.upload-zone');
+        const uploadProgress = document.querySelector('.upload-progress');
+        const progressFill = document.querySelector('.progress-fill');
+        const fileGrid = document.getElementById('fileGrid');
+        const loading = document.querySelector('.loading');
 
-      const supabaseUrl = "https://vbvlirmuwrfqispfagxr.supabase.co";
-      const supabaseKey = process.env.SUPABASE_KEY;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      // 🔧 SUPABASE CONFIGURATION - Update these with your Supabase project details
-    //   const SUPABASE_URL = "YOUR_SUPABASE_URL"; // Replace with your Supabase URL
-    //   const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // Replace with your Supabase anon key
-
-    //   // Initialize Supabase client
-    //   const supabase = window.supabase.createClient(
-    //     SUPABASE_URL,
-    //     SUPABASE_ANON_KEY
-    //   );
-
-    //   let files = [];
-
-      // File upload handling
-      const fileInput = document.getElementById("fileInput");
-      const uploadZone = document.querySelector(".upload-zone");
-      const uploadProgress = document.querySelector(".upload-progress");
-      const progressFill = document.querySelector(".progress-fill");
-      const fileGrid = document.getElementById("fileGrid");
-      const loading = document.querySelector(".loading");
-
-      // Drag and drop functionality
-      uploadZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        uploadZone.classList.add("dragover");
-      });
-
-      uploadZone.addEventListener("dragleave", () => {
-        uploadZone.classList.remove("dragover");
-      });
-
-      uploadZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove("dragover");
-        handleFiles(e.dataTransfer.files);
-      });
-
-      fileInput.addEventListener("change", (e) => {
-        handleFiles(e.target.files);
-      });
-
-      function handleFiles(fileList) {
-        Array.from(fileList).forEach((file) => {
-          if (file.size > 50 * 1024 * 1024) {
-            // 50MB limit
-            showNotification("File too large! Maximum size is 50MB.", "error");
-            return;
-          }
-          uploadFile(file);
+        // Drag and drop functionality
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
         });
-      }
 
-      async function uploadFile(file) {
-        uploadProgress.style.display = "block";
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
 
-        try {
-          // Generate unique filename
-          const timestamp = Date.now();
-          const fileName = `${timestamp}_${file.name}`;
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
 
-          // Upload file to Supabase storage
-          const { data: uploadData, error: uploadError } =
-            await supabase.storage.from("shared-files").upload(fileName, file, {
-              cacheControl: "3600",
-              upsert: false,
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(fileList) {
+            Array.from(fileList).forEach(file => {
+                if (file.size > 50 * 1024 * 1024) { // 50MB limit
+                    showNotification('File too large! Maximum size is 50MB.', 'error');
+                    return;
+                }
+                uploadFile(file);
             });
-
-          if (uploadError) throw uploadError;
-
-          // Get public URL for the uploaded file
-          const { data: urlData } = supabase.storage
-            .from("shared-files")
-            .getPublicUrl(fileName);
-
-          // Create file metadata object
-          const fileMetadata = {
-            name: file.name,
-            original_name: file.name,
-            file_path: fileName,
-            size_bytes: file.size,
-            size_formatted: formatFileSize(file.size),
-            mime_type: file.type || "application/octet-stream",
-            public_url: urlData.publicUrl,
-            download_count: 0,
-            created_at: new Date().toISOString(),
-          };
-
-          // Save metadata to database
-          const { data: dbData, error: dbError } = await supabase
-            .from("files")
-            .insert([fileMetadata])
-            .select();
-
-          if (dbError) throw dbError;
-
-          // Animate progress to completion
-          progressFill.style.width = "100%";
-
-          setTimeout(() => {
-            uploadProgress.style.display = "none";
-            progressFill.style.width = "0%";
-            fileInput.value = "";
-            loadFiles();
-            showNotification("File uploaded successfully!", "success");
-          }, 500);
-        } catch (error) {
-          console.error("Upload error:", error);
-          uploadProgress.style.display = "none";
-          progressFill.style.width = "0%";
-          showNotification("Upload failed: " + error.message, "error");
         }
-      }
 
-      async function loadFiles() {
-        loading.style.display = "block";
-        fileGrid.style.display = "none";
+        async function uploadFile(file) {
+            uploadProgress.style.display = 'block';
+            
+            if (!isSupabaseEnabled) {
+                // Fallback to localStorage demo mode
+                uploadFileDemo(file);
+                return;
+            }
+            
+            try {
+                // Generate unique filename
+                const timestamp = Date.now();
+                const fileName = `${timestamp}_${file.name}`;
+                
+                // Upload file to Supabase storage
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('shared-files')
+                    .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
 
-        try {
-          // Fetch files from Supabase database
-          const { data, error } = await supabase
-            .from("files")
-            .select("*")
-            .order("created_at", { ascending: false });
+                if (uploadError) throw uploadError;
 
-          if (error) throw error;
+                // Get public URL for the uploaded file
+                const { data: urlData } = supabase.storage
+                    .from('shared-files')
+                    .getPublicUrl(fileName);
 
-          files = data || [];
-          displayFiles();
-        } catch (error) {
-          console.error("Load files error:", error);
-          showNotification("Failed to load files: " + error.message, "error");
-          files = [];
-          displayFiles();
-        } finally {
-          loading.style.display = "none";
-          fileGrid.style.display = "grid";
+                // Create file metadata object
+                const fileMetadata = {
+                    name: file.name,
+                    original_name: file.name,
+                    file_path: fileName,
+                    size_bytes: file.size,
+                    size_formatted: formatFileSize(file.size),
+                    mime_type: file.type || 'application/octet-stream',
+                    public_url: urlData.publicUrl,
+                    download_count: 0,
+                    created_at: new Date().toISOString()
+                };
+
+                // Save metadata to database
+                const { data: dbData, error: dbError } = await supabase
+                    .from('files')
+                    .insert([fileMetadata])
+                    .select();
+
+                if (dbError) throw dbError;
+
+                // Animate progress to completion
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    uploadProgress.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    fileInput.value = '';
+                    loadFiles();
+                    showNotification('File uploaded successfully!', 'success');
+                }, 500);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                uploadProgress.style.display = 'none';
+                progressFill.style.width = '0%';
+                showNotification('Upload failed: ' + error.message, 'error');
+            }
         }
-      }
 
-      function displayFiles() {
-        if (files.length === 0) {
-          fileGrid.innerHTML = `
+        // Demo mode upload function (localStorage fallback)
+        function uploadFileDemo(file) {
+            // Simulate upload progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Create file object
+                    const fileObj = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        original_name: file.name,
+                        size_formatted: formatFileSize(file.size),
+                        mime_type: file.type || 'application/octet-stream',
+                        created_at: new Date().toISOString(),
+                        download_count: 0,
+                        public_url: null // Will use base64 for demo
+                    };
+
+                    // Convert file to base64 for demo purposes
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        fileObj.public_url = e.target.result;
+                        files.push(fileObj);
+                        localStorage.setItem('sharedFiles', JSON.stringify(files));
+                        
+                        setTimeout(() => {
+                            uploadProgress.style.display = 'none';
+                            progressFill.style.width = '0%';
+                            fileInput.value = '';
+                            loadFiles();
+                            showNotification('File uploaded successfully! (Demo mode)', 'success');
+                        }, 500);
+                    };
+                    reader.readAsDataURL(file);
+                }
+                progressFill.style.width = progress + '%';
+            }, 100);
+        }
+
+        async function loadFiles() {
+            loading.style.display = 'block';
+            fileGrid.style.display = 'none';
+            
+            if (!isSupabaseEnabled) {
+                // Fallback to localStorage
+                setTimeout(() => {
+                    files = JSON.parse(localStorage.getItem('sharedFiles') || '[]');
+                    displayFiles();
+                    loading.style.display = 'none';
+                    fileGrid.style.display = 'grid';
+                }, 800);
+                return;
+            }
+            
+            try {
+                // Fetch files from Supabase database
+                const { data, error } = await supabase
+                    .from('files')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                files = data || [];
+                displayFiles();
+                
+            } catch (error) {
+                console.error('Load files error:', error);
+                showNotification('Failed to load files: ' + error.message, 'error');
+                files = [];
+                displayFiles();
+            } finally {
+                loading.style.display = 'none';
+                fileGrid.style.display = 'grid';
+            }
+        }
+
+        function displayFiles() {
+            if (files.length === 0) {
+                fileGrid.innerHTML = `
                     <div class="empty-state" style="grid-column: 1 / -1;">
                         <i class="fas fa-folder-open"></i>
                         <p>No files shared yet. Upload the first file!</p>
                     </div>
                 `;
-          return;
-        }
+                return;
+            }
 
-        fileGrid.innerHTML = files
-          .map(
-            (file) => `
+            fileGrid.innerHTML = files.map(file => `
                 <div class="file-card">
                     <div class="file-icon">
                         <i class="${getFileIcon(file.mime_type)}"></i>
                     </div>
                     <div class="file-name">${file.name}</div>
                     <div class="file-meta">
-                        ${file.size_formatted} • ${new Date(
-              file.created_at
-            ).toLocaleDateString()} • ${file.download_count} downloads
+                        ${file.size_formatted} • ${new Date(file.created_at).toLocaleDateString()} • ${file.download_count} downloads
                     </div>
                     <div class="file-actions">
-                        <button class="btn btn-download" onclick="downloadFile('${
-                          file.id
-                        }')">
+                        <button class="btn btn-download" onclick="downloadFile('${file.id}')">
                             <i class="fas fa-download"></i> Download
                         </button>
-                        <button class="btn btn-copy" onclick="copyLink('${
-                          file.id
-                        }')">
+                        <button class="btn btn-copy" onclick="copyLink('${file.id}')">
                             <i class="fas fa-link"></i>
                         </button>
                     </div>
                 </div>
-            `
-          )
-          .join("");
-      }
-
-      async function downloadFile(fileId) {
-        try {
-          const file = files.find((f) => f.id == fileId);
-          if (!file) return;
-
-          // Increment download count in database
-          const { error: updateError } = await supabase
-            .from("files")
-            .update({ download_count: file.download_count + 1 })
-            .eq("id", fileId);
-
-          if (updateError) {
-            console.error("Download count update error:", updateError);
-          }
-
-          // Create download link using the public URL
-          const link = document.createElement("a");
-          link.href = file.public_url;
-          link.download = file.original_name || file.name;
-          link.target = "_blank";
-          link.click();
-
-          // Update local file object and refresh display
-          file.download_count++;
-          displayFiles();
-          showNotification("Download started!", "success");
-        } catch (error) {
-          console.error("Download error:", error);
-          showNotification("Download failed: " + error.message, "error");
+            `).join('');
         }
-      }
 
-      function copyLink(fileId) {
-        const link = `${window.location.origin}${window.location.pathname}#file-${fileId}`;
-        navigator.clipboard.writeText(link).then(() => {
-          showNotification("Share link copied to clipboard!", "success");
-        });
-      }
+        async function downloadFile(fileId) {
+            try {
+                const file = files.find(f => f.id == fileId);
+                if (!file) return;
 
-      function getFileIcon(mimeType) {
-        if (mimeType.startsWith("image/")) return "fas fa-file-image";
-        if (mimeType.startsWith("video/")) return "fas fa-file-video";
-        if (mimeType.startsWith("audio/")) return "fas fa-file-audio";
-        if (mimeType.includes("pdf")) return "fas fa-file-pdf";
-        if (mimeType.includes("word")) return "fas fa-file-word";
-        if (mimeType.includes("excel") || mimeType.includes("spreadsheet"))
-          return "fas fa-file-excel";
-        if (
-          mimeType.includes("powerpoint") ||
-          mimeType.includes("presentation")
-        )
-          return "fas fa-file-powerpoint";
-        if (mimeType.includes("zip") || mimeType.includes("rar"))
-          return "fas fa-file-archive";
-        if (mimeType.includes("text")) return "fas fa-file-alt";
-        return "fas fa-file";
-      }
+                if (isSupabaseEnabled) {
+                    // Supabase mode: increment download count in database
+                    const { error: updateError } = await supabase
+                        .from('files')
+                        .update({ download_count: file.download_count + 1 })
+                        .eq('id', fileId);
 
-      function formatFileSize(bytes) {
-        if (bytes === 0) return "0 Bytes";
-        const k = 1024;
-        const sizes = ["Bytes", "KB", "MB", "GB"];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-      }
+                    if (updateError) {
+                        console.error('Download count update error:', updateError);
+                    }
+                } else {
+                    // Demo mode: update localStorage
+                    file.download_count++;
+                    localStorage.setItem('sharedFiles', JSON.stringify(files));
+                }
 
-      function showNotification(message, type) {
-        const notification = document.getElementById("notification");
-        notification.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add("show");
-
-        setTimeout(() => {
-          notification.classList.remove("show");
-        }, 3000);
-      }
-
-      // Auto-refresh files every 30 seconds for real-time sync
-      setInterval(async () => {
-        const currentCount = files.length;
-        try {
-          const { data, error } = await supabase
-            .from("files")
-            .select("*")
-            .order("created_at", { ascending: false });
-
-          if (!error && data && data.length !== currentCount) {
-            files = data;
-            displayFiles();
-          }
-        } catch (error) {
-          console.error("Auto-refresh error:", error);
-        }
-      }, 30000);
-
-      // Set up real-time subscriptions for live updates
-      const setupRealtimeSubscription = () => {
-        supabase
-          .channel("files-channel")
-          .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "files" },
-            (payload) => {
-              console.log("Real-time update:", payload);
-              loadFiles(); // Refresh files when changes occur
+                // Create download link using the public URL
+                const link = document.createElement('a');
+                link.href = file.public_url;
+                link.download = file.original_name || file.name;
+                link.target = '_blank';
+                link.click();
+                
+                // Update local file object and refresh display
+                file.download_count++;
+                displayFiles();
+                showNotification('Download started!', 'success');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('Download failed: ' + error.message, 'error');
             }
-          )
-          .subscribe();
-      };
-
-      // Initialize real-time subscription
-      setupRealtimeSubscription();
-
-      // Check Supabase connection on load
-      async function checkSupabaseConnection() {
-        if (
-          SUPABASE_URL === "YOUR_SUPABASE_URL" ||
-          SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY"
-        ) {
-          showNotification(
-            "⚠️ Please configure your Supabase credentials in the JavaScript code",
-            "error"
-          );
-          return false;
         }
 
-        try {
-          const { data, error } = await supabase
-            .from("files")
-            .select("count", { count: "exact", head: true });
-          if (error && error.code === "PGRST116") {
-            showNotification(
-              '⚠️ Database table "files" not found. Please create the required tables.',
-              "error"
-            );
-            return false;
-          }
-          return true;
-        } catch (error) {
-          showNotification(
-            "⚠️ Failed to connect to Supabase: " + error.message,
-            "error"
-          );
-          return false;
+        function copyLink(fileId) {
+            const link = `${window.location.origin}${window.location.pathname}#file-${fileId}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showNotification('Share link copied to clipboard!', 'success');
+            });
         }
-      }
 
-      // Initialize app
-      async function initializeApp() {
-        const isConnected = await checkSupabaseConnection();
-        if (isConnected) {
-          loadFiles();
-        } else {
-          // Fallback to localStorage for demo
-          files = JSON.parse(localStorage.getItem("sharedFiles") || "[]");
-          displayFiles();
-          loading.style.display = "none";
-          fileGrid.style.display = "grid";
+        function getFileIcon(mimeType) {
+            if (mimeType.startsWith('image/')) return 'fas fa-file-image';
+            if (mimeType.startsWith('video/')) return 'fas fa-file-video';
+            if (mimeType.startsWith('audio/')) return 'fas fa-file-audio';
+            if (mimeType.includes('pdf')) return 'fas fa-file-pdf';
+            if (mimeType.includes('word')) return 'fas fa-file-word';
+            if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'fas fa-file-excel';
+            if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'fas fa-file-powerpoint';
+            if (mimeType.includes('zip') || mimeType.includes('rar')) return 'fas fa-file-archive';
+            if (mimeType.includes('text')) return 'fas fa-file-alt';
+            return 'fas fa-file';
         }
-      }
 
-      // Start the app
-      initializeApp();
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
 
-      // Handle direct file links
-      if (window.location.hash.startsWith("#file-")) {
-        const fileId = window.location.hash.substring(6);
-        setTimeout(() => {
-          const fileElement = document.querySelector(
-            `[onclick="downloadFile('${fileId}')"]`
-          );
-          if (fileElement) {
-            fileElement.scrollIntoView({ behavior: "smooth" });
-            fileElement.closest(".file-card").style.animation = "pulse 2s";
-          }
-        }, 1000);
-      }
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-refresh files every 30 seconds for real-time sync
+        setInterval(async () => {
+            if (!isSupabaseEnabled) {
+                // Demo mode: check localStorage
+                const currentCount = files.length;
+                files = JSON.parse(localStorage.getItem('sharedFiles') || '[]');
+                if (files.length !== currentCount) {
+                    displayFiles();
+                }
+                return;
+            }
+
+            // Supabase mode: fetch from database
+            const currentCount = files.length;
+            try {
+                const { data, error } = await supabase
+                    .from('files')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (!error && data && data.length !== currentCount) {
+                    files = data;
+                    displayFiles();
+                }
+            } catch (error) {
+                console.error('Auto-refresh error:', error);
+            }
+        }, 30000);
+
+        // Set up real-time subscriptions for live updates (Supabase only)
+        const setupRealtimeSubscription = () => {
+            if (!isSupabaseEnabled) return;
+            
+            try {
+                supabase
+                    .channel('files-channel')
+                    .on('postgres_changes', 
+                        { event: '*', schema: 'public', table: 'files' }, 
+                        (payload) => {
+                            console.log('Real-time update:', payload);
+                            loadFiles(); // Refresh files when changes occur
+                        }
+                    )
+                    .subscribe();
+            } catch (error) {
+                console.error('Real-time subscription error:', error);
+            }
+        };
+
+        // Check Supabase connection on load
+        async function checkSupabaseConnection() {
+            if (!isSupabaseEnabled) {
+                return false;
+            }
+            
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+                return false;
+            }
+            
+            try {
+                // Simple test to check if Supabase is working
+                const { data, error } = await supabase.from('files').select('count', { count: 'exact', head: true });
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        showNotification('⚠️ Database table "files" not found. Please run the setup SQL.', 'error');
+                    } else {
+                        showNotification('⚠️ Supabase connection error: ' + error.message, 'error');
+                    }
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                showNotification('⚠️ Failed to connect to Supabase: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // Initialize app with proper library loading
+        async function initializeApp() {
+            // Wait a bit for Supabase library to fully load
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Try multiple ways to access Supabase
+            if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                try {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    isSupabaseEnabled = true;
+                } catch (error) {
+                    console.error('Supabase initialization failed:', error);
+                    isSupabaseEnabled = false;
+                }
+            } else {
+                console.warn('Supabase not available, running in demo mode');
+                isSupabaseEnabled = false;
+            }
+            
+            // Check connection if Supabase is available
+            let isConnected = false;
+            if (isSupabaseEnabled) {
+                isConnected = await checkSupabaseConnection();
+                if (isConnected) {
+                    setupRealtimeSubscription();
+                }
+            }
+            
+            // Load files regardless of connection status
+            loadFiles();
+            
+            // Show status
+            if (isSupabaseEnabled && isConnected) {
+                showNotification('✅ Connected to Supabase - Real-time sync enabled!', 'success');
+            } else if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+                showNotification('⚠️ Supabase configured but connection failed - using demo mode', 'error');
+            } else {
+                showNotification('📱 Demo mode active - configure Supabase for cloud storage', 'error');
+            }
+        }
+
+        // Start the app when page loads with multiple triggers
+        function startApp() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeApp);
+            } else {
+                initializeApp();
+            }
+        }
+
+        // Also try to start after window loads completely
+        window.addEventListener('load', () => {
+            if (!isSupabaseEnabled) {
+                initializeApp();
+            }
+        });
+
+        startApp();
+
+        // Handle direct file links
+        if (window.location.hash.startsWith('#file-')) {
+            const fileId = window.location.hash.substring(6);
+            setTimeout(() => {
+                const fileElement = document.querySelector(`[onclick="downloadFile('${fileId}')"]`);
+                if (fileElement) {
+                    fileElement.scrollIntoView({ behavior: 'smooth' });
+                    fileElement.closest('.file-card').style.animation = 'pulse 2s';
+                }
+            }, 1000);
+        }
     </script>
-  </body>
+</body>
 </html>
