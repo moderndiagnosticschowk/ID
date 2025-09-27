@@ -3,791 +3,1168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - User Uploads</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-size: 1.8em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .user-toggle {
-            display: flex;
-            gap: 10px;
-        }
-
-        .toggle-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .toggle-btn:not(.active) {
-            background: #f8f9fa;
-            color: #666;
-        }
-
-        .toggle-btn:not(.active):hover {
-            background: #e9ecef;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* User Upload Section */
-        .user-section {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 2.5em;
-            color: #333;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-subtitle {
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 1.1em;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            font-size: 1.2em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            margin-bottom: 30px;
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-area {
-            border: 3px dashed #ddd;
-            border-radius: 15px;
-            padding: 40px;
-            margin: 20px 0;
-            background: #fafafa;
-            transition: all 0.3s ease;
-        }
-
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        /* Admin Dashboard Section */
-        .admin-section {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .admin-stats {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            min-width: 120px;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .admin-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-box {
-            padding: 12px 20px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            font-size: 1em;
-            min-width: 200px;
-            transition: border-color 0.3s ease;
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .filter-btn, .clear-all-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .filter-btn:hover {
-            background: #218838;
-        }
-
-        .clear-all-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .clear-all-btn:hover {
-            background: #c82333;
-        }
-
-        .files-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .file-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .file-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .upload-time {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
-        }
-
-        .file-preview {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            margin: 30px 0 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #e9ecef;
-            overflow: hidden;
-        }
-
-        .file-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .pdf-icon {
-            font-size: 4em;
-            color: #dc3545;
-        }
-
-        .file-info {
-            text-align: center;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            word-break: break-word;
-        }
-
-        .file-size {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .file-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .download-btn, .delete-btn, .approve-btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-
-        .download-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .download-btn:hover {
-            background: #218838;
-        }
-
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .delete-btn:hover {
-            background: #c82333;
-        }
-
-        .approve-btn {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .approve-btn:hover {
-            background: #138496;
-        }
-
-        .no-files {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            padding: 60px 20px;
-            font-size: 1.2em;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @keyframes newFileAlert {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .new-file {
-            animation: newFileAlert 0.6s ease;
-            border: 2px solid #28a745;
-        }
-
-        @media (max-width: 768px) {
-            .admin-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .admin-stats {
-                justify-content: center;
-            }
-
-            .admin-controls {
-                justify-content: center;
-            }
-
-            .search-box {
-                min-width: 100%;
-            }
-
-            .files-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <title>File Manager</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+    <style>
+        /* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header h1 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.header-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* File count display */
+.file-count {
+    background: #f0f9ff;
+    color: #1e40af;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 2px solid #3b82f6;
+}
+
+.btn-primary {
+    background: #10b981;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.btn-outline:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Upload Section */
+.upload-section {
+    margin-bottom: 3rem;
+}
+
+.drop-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #fff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+.drop-content h3 {
+    margin: 1rem 0 0.5rem;
+    color: #374151;
+    font-weight: 600;
+}
+
+.drop-content p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: #9ca3af;
+    margin: 0 auto;
+}
+
+/* Upload Progress */
+.upload-progress {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+#progress-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* File List Section */
+.file-list-section h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.table-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.file-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-table th,
+.file-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.file-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.file-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.file-table td {
+    font-size: 0.9rem;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 800px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow: auto;
+}
+
+.preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.preview-container img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.preview-container iframe {
+    width: 100%;
+    height: 70vh;
+    border: none;
+    border-radius: 8px;
+}
+
+.preview-error {
+    text-align: center;
+    color: #6b7280;
+    padding: 2rem;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Footer */
+.footer {
+    background: #fff;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main {
+        padding: 1rem;
+    }
+    
+    .header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .header-controls {
+        justify-content: center;
+    }
+    
+    .drop-zone {
+        padding: 2rem 1rem;
+    }
+    
+    .file-table {
+        font-size: 0.8rem;
+    }
+    
+    .file-table th,
+    .file-table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .file-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        margin: 1rem;
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .preview-container iframe {
+        height: 50vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .file-table thead {
+        display: none;
+    }
+    
+    .file-table,
+    .file-table tbody,
+    .file-table tr,
+    .file-table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .file-table tr {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #fff;
+    }
+    
+    .file-table td {
+        border: none;
+        padding: 0.25rem 0;
+        position: relative;
+        padding-left: 30%;
+    }
+    
+    .file-table td:before {
+        content: attr(data-label) ": ";
+        position: absolute;
+        left: 0;
+        width: 25%;
+        font-weight: 600;
+        color: #374151;
+    }
+}
+    </style>
 <body>
-    <nav class="navbar">
-        <div class="nav-content">
-            <div class="logo">📊 Upload Dashboard</div>
-            <div class="user-toggle">
-                <button class="toggle-btn active" id="userBtn" onclick="showUserSection()">
-                    👤 User Upload
-                </button>
-                <button class="toggle-btn" id="adminBtn" onclick="showAdminSection()">
-                    👨‍💼 Admin Panel
-                </button>
-            </div>
+    <!-- Header -->
+    <header class="header">
+        <h1>🌐 Public File Sharing</h1>
+        <div class="header-controls">
+            <span class="file-count">Total Files: <span id="total-files">0</span></span>
+            <button id="refresh-btn" class="btn btn-primary">🔄 Refresh</button>
         </div>
-    </nav>
+    </header>
 
-    <div class="container">
-        <!-- User Upload Section -->
-        <div id="userSection" class="user-section">
-            <h1 class="section-title">📁 Upload Your Files</h1>
-            <p class="section-subtitle">Upload Images (JPG, PNG, GIF) & PDF files</p>
-            
-            <button class="upload-btn" onclick="triggerFileInput()">
-                🔍 Browse Files
-            </button>
-            
-            <input type="file" id="fileInput" class="file-input" 
-                   multiple 
-                   accept="image/*,.pdf" 
-                   onchange="handleFileSelect(event)">
-            
-            <div class="upload-area" id="uploadArea">
-                <p>Or drag and drop Images/PDFs here</p>
-            </div>
-
-            <div id="uploadSuccess" style="display: none; margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; color: #155724; border-radius: 10px;">
-                ✅ Files uploaded successfully! Admin can now see and download them.
-            </div>
-        </div>
-
-        <!-- Admin Dashboard Section -->
-        <div id="adminSection" class="admin-section hidden">
-            <div class="admin-header">
-                <div>
-                    <h2 class="section-title" style="margin-bottom: 10px;">👨‍💼 Admin Dashboard</h2>
-                    <p style="color: #666;">Manage all user uploaded files</p>
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Upload Area -->
+        <section class="upload-section">
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <h3>Upload & Share Files Publicly</h3>
+                    <p>Anyone can upload and download files from here</p>
                 </div>
-                
-                <div class="admin-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalFiles">0</div>
-                        <div class="stat-label">Total Files</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalImages">0</div>
-                        <div class="stat-label">Images</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalPDFs">0</div>
-                        <div class="stat-label">PDFs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalUsers">0</div>
-                        <div class="stat-label">Users</div>
-                    </div>
+                <input type="file" id="file-input" multiple hidden>
+            </div>
+            
+            <!-- Upload Progress -->
+            <div id="upload-progress" class="upload-progress hidden">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-text">Uploading... 0%</span>
+            </div>
+        </section>
+
+        <!-- File List -->
+        <section class="file-list-section">
+            <h2>📁 Public Files (Everyone can see & download)</h2>
+            <div class="table-container">
+                <table id="file-table" class="file-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Size</th>
+                            <th>Type</th>
+                            <th>Uploader</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="file-table-body">
+                        <!-- Files will be inserted here -->
+                    </tbody>
+                </table>
+                <div id="empty-state" class="empty-state">
+                    <p>🚀 No public files yet. Be the first to upload and share!</p>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <div class="admin-controls">
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search files by name, user, or type..." onkeyup="filterFiles()">
-                <button class="filter-btn" onclick="filterByType('all')">All Files</button>
-                <button class="filter-btn" onclick="filterByType('image')">Images Only</button>
-                <button class="filter-btn" onclick="filterByType('pdf')">PDFs Only</button>
-                <button class="clear-all-btn" onclick="clearAllFiles()">🗑️ Clear All</button>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>🌍 Public File Sharing Platform - Upload anything, Share everything! | Built with ❤️</p>
+    </footer>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">File Preview</h3>
+                <button id="modal-close" class="modal-close">&times;</button>
             </div>
-
-            <div id="adminFilesGrid" class="files-grid">
-                <div class="no-files">No files uploaded yet. Users can upload files using the User Upload section.</div>
+            <div class="modal-body">
+                <div id="preview-container" class="preview-container">
+                    <!-- Preview content will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Connecting to Google Drive...</p>
+    </div>
     <script>
-        let allUploadedFiles = JSON.parse(localStorage.getItem('allUploadedFiles')) || [];
-        let currentFilter = 'all';
-        let currentSection = 'user';
-
-        // Generate unique user ID for session
-        let currentUser = sessionStorage.getItem('currentUser') || `User_${Date.now().toString().slice(-6)}`;
-        sessionStorage.setItem('currentUser', currentUser);
-
-        function showUserSection() {
-            document.getElementById('userSection').classList.remove('hidden');
-            document.getElementById('adminSection').classList.add('hidden');
-            document.getElementById('userBtn').classList.add('active');
-            document.getElementById('adminBtn').classList.remove('active');
-            currentSection = 'user';
-        }
-
-        function showAdminSection() {
-            document.getElementById('userSection').classList.add('hidden');
-            document.getElementById('adminSection').classList.remove('hidden');
-            document.getElementById('userBtn').classList.remove('active');
-            document.getElementById('adminBtn').classList.add('active');
-            currentSection = 'admin';
-            displayAdminFiles();
-        }
-
-        function triggerFileInput() {
-            document.getElementById('fileInput').click();
-        }
-
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            console.log('Selected files:', files.length);
-            
-            if (files.length === 0) return;
-
-            let uploadedCount = 0;
-            const totalFiles = files.length;
-            
-            files.forEach((file, index) => {
-                console.log(`Processing file ${index + 1}: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
-                
-                // Check if file is image or PDF
-                const isImage = file.type.startsWith('image/');
-                const isPDF = file.type === 'application/pdf';
-                
-                if (isImage || isPDF) {
-                    console.log('Valid file type detected:', isImage ? 'Image' : 'PDF');
-                    
-                    const fileData = {
-                        id: Date.now() + Math.random() + index,
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        uploadTime: new Date().toLocaleString(),
-                        uploadDate: new Date().toISOString(),
-                        isImage: isImage,
-                        isPDF: isPDF,
-                        uploadedBy: currentUser,
-                        approved: false
-                    };
-
-                    // Convert file to base64 for storage
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        console.log('File read successfully:', file.name);
-                        fileData.data = e.target.result;
-                        allUploadedFiles.push(fileData);
-                        uploadedCount++;
-                        
-                        console.log('Total files now:', allUploadedFiles.length);
-                        saveToLocalStorage();
-                        
-                        // Show success message when all files are processed
-                        if (uploadedCount === totalFiles) {
-                            document.getElementById('uploadSuccess').style.display = 'block';
-                            setTimeout(() => {
-                                document.getElementById('uploadSuccess').style.display = 'none';
-                            }, 5000);
-                        }
-                        
-                        // If admin panel is open, refresh it
-                        if (currentSection === 'admin') {
-                            displayAdminFiles();
-                        }
-                    };
-                    reader.onerror = function(e) {
-                        console.error('Error reading file:', file.name, e);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    console.log('Invalid file type:', file.type);
-                    alert(`File "${file.name}" is not supported. Please upload only Images or PDF files.`);
-                }
-            });
-
-            // Clear input
-            event.target.value = '';
-        }
-
-        function displayAdminFiles() {
-            console.log('Displaying admin files. Total:', allUploadedFiles.length);
-            const filesGrid = document.getElementById('adminFilesGrid');
-            
-            // Apply current filter
-            let filteredFiles = allUploadedFiles;
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            
-            if (searchTerm) {
-                filteredFiles = filteredFiles.filter(file => 
-                    file.name.toLowerCase().includes(searchTerm) ||
-                    file.uploadedBy.toLowerCase().includes(searchTerm) ||
-                    file.type.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            if (currentFilter !== 'all') {
-                filteredFiles = filteredFiles.filter(file => 
-                    currentFilter === 'image' ? file.isImage : file.isPDF
-                );
-            }
-
-            if (filteredFiles.length === 0) {
-                filesGrid.innerHTML = '<div class="no-files">No files found matching your criteria.</div>';
-            } else {
-                filesGrid.innerHTML = '';
-
-                // Sort by upload date (newest first)
-                filteredFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-
-                filteredFiles.forEach((file, index) => {
-                    console.log(`Creating admin card for file ${index + 1}: ${file.name}`);
-                    
-                    const fileCard = document.createElement('div');
-                    fileCard.className = 'file-card';
-                    
-                    // Check if file was uploaded in last 5 minutes (mark as new)
-                    const isNew = (Date.now() - new Date(file.uploadDate).getTime()) < 300000;
-                    if (isNew) {
-                        fileCard.classList.add('new-file');
-                    }
-                    
-                    const previewHTML = file.isImage 
-                        ? `<img src="${file.data}" alt="${file.name}" onerror="console.log('Image load error for: ${file.name}')">`
-                        : `<div class="pdf-icon">📄</div>`;
-
-                    fileCard.innerHTML = `
-                        <div class="user-info">${file.uploadedBy}</div>
-                        <div class="upload-time">${file.uploadTime}</div>
-                        <div class="file-preview">
-                            ${previewHTML}
-                        </div>
-                        <div class="file-info">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-size">${formatFileSize(file.size)}</div>
-                            <div class="file-actions">
-                                <button class="download-btn" onclick="downloadFile('${file.id}')">
-                                    💾 Download
-                                </button>
-                                <button class="approve-btn" onclick="approveFile('${file.id}')" ${file.approved ? 'disabled' : ''}>
-                                    ${file.approved ? '✅ Approved' : '👍 Approve'}
-                                </button>
-                                <button class="delete-btn" onclick="deleteFile('${file.id}')">
-                                    🗑️ Delete
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    filesGrid.appendChild(fileCard);
-                    console.log(`Admin card created for: ${file.name}`);
-                });
-            }
-
-            updateAdminStats();
-        }
-
-        function updateAdminStats() {
-            const totalFiles = allUploadedFiles.length;
-            const totalImages = allUploadedFiles.filter(f => f.isImage).length;
-            const totalPDFs = allUploadedFiles.filter(f => f.isPDF).length;
-            const uniqueUsers = [...new Set(allUploadedFiles.map(f => f.uploadedBy))].length;
-
-            document.getElementById('totalFiles').textContent = totalFiles;
-            document.getElementById('totalImages').textContent = totalImages;
-            document.getElementById('totalPDFs').textContent = totalPDFs;
-            document.getElementById('totalUsers').textContent = uniqueUsers;
-        }
-
-        function downloadFile(fileId) {
-            console.log('Downloading file with ID:', fileId);
-            const file = allUploadedFiles.find(f => f.id.toString() === fileId.toString());
-            if (file) {
-                const link = document.createElement('a');
-                link.href = file.data;
-                link.download = file.name;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                console.log('File not found for download');
-            }
-        }
-
-        function approveFile(fileId) {
-            const fileIndex = allUploadedFiles.findIndex(f => f.id.toString() === fileId.toString());
-            if (fileIndex !== -1) {
-                allUploadedFiles[fileIndex].approved = true;
-                saveToLocalStorage();
-                displayAdminFiles();
-            }
-        }
-
-        function deleteFile(fileId) {
-            if (confirm('Are you sure you want to delete this file?')) {
-                console.log('Deleting file with ID:', fileId);
-                allUploadedFiles = allUploadedFiles.filter(f => f.id.toString() !== fileId.toString());
-                saveToLocalStorage();
-                displayAdminFiles();
-            }
-        }
-
-        function clearAllFiles() {
-            if (confirm('Are you sure you want to delete ALL files? This action cannot be undone.')) {
-                allUploadedFiles = [];
-                saveToLocalStorage();
-                displayAdminFiles();
-            }
-        }
-
-        function filterFiles() {
-            displayAdminFiles();
-        }
-
-        function filterByType(type) {
-            currentFilter = type;
-            displayAdminFiles();
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function saveToLocalStorage() {
-            try {
-                localStorage.setItem('allUploadedFiles', JSON.stringify(allUploadedFiles));
-                console.log('Files saved to localStorage successfully');
-            } catch (error) {
-                console.error('Error saving to localStorage:', error);
-                alert('Error saving files. Storage might be full.');
-            }
-        }
-
-        // Drag and drop functionality for user section
-        const uploadArea = document.getElementById('uploadArea');
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            const files = Array.from(e.dataTransfer.files);
-            const allowedFiles = files.filter(file => 
-                file.type.startsWith('image/') || file.type === 'application/pdf'
-            );
-
-            if (allowedFiles.length > 0) {
-                const event = { target: { files: allowedFiles, value: '' } };
-                handleFileSelect(event);
-            }
-        });
-
-        // Initialize on page load
-        updateAdminStats();
+        // Public File Sharing Platform
+class PublicFileManager {
+    constructor() {
+        this.files = [];
+        this.maxFileSize = 100 * 1024 * 1024; // 100MB limit
+        this.allowedTypes = []; // Allow all file types
         
-        // Auto-refresh admin panel every 10 seconds if it's active
+        this.initializeElements();
+        this.initializeEventListeners();
+        this.initializeStorage();
+        this.loadPublicFiles();
+        this.updateFileCount();
+    }
+
+    initializeElements() {
+        // Main elements
+        this.dropZone = document.getElementById('drop-zone');
+        this.fileInput = document.getElementById('file-input');
+        this.uploadProgress = document.getElementById('upload-progress');
+        this.progressFill = document.getElementById('progress-fill');
+        this.progressText = document.getElementById('progress-text');
+        this.fileTableBody = document.getElementById('file-table-body');
+        this.emptyState = document.getElementById('empty-state');
+        this.totalFilesSpan = document.getElementById('total-files');
+        
+        // Modal elements
+        this.previewModal = document.getElementById('preview-modal');
+        this.modalTitle = document.getElementById('modal-title');
+        this.modalClose = document.getElementById('modal-close');
+        this.previewContainer = document.getElementById('preview-container');
+        
+        // Control buttons
+        this.refreshBtn = document.getElementById('refresh-btn');
+    }
+
+    initializeEventListeners() {
+        // Drag and drop
+        this.dropZone.addEventListener('dragover', this.handleDragOver.bind(this));
+        this.dropZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        this.dropZone.addEventListener('drop', this.handleDrop.bind(this));
+        this.dropZone.addEventListener('click', () => this.fileInput.click());
+        
+        // File input
+        this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+        
+        // Modal
+        this.modalClose.addEventListener('click', this.closeModal.bind(this));
+        this.previewModal.addEventListener('click', (e) => {
+            if (e.target === this.previewModal) this.closeModal();
+        });
+        
+        // Control buttons
+        this.refreshBtn.addEventListener('click', this.refreshFiles.bind(this));
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.closeModal();
+        });
+
+        // Auto-refresh every 10 seconds to get new files from other users
         setInterval(() => {
-            if (currentSection === 'admin') {
-                const currentLength = allUploadedFiles.length;
-                const stored = JSON.parse(localStorage.getItem('allUploadedFiles')) || [];
-                if (stored.length !== currentLength) {
-                    allUploadedFiles = stored;
-                    displayAdminFiles();
-                }
-            }
+            this.refreshFiles();
         }, 10000);
+    }
+
+    async initializeStorage() {
+        // Use localStorage as global storage (simulating a server)
+        // In real implementation, you'd use a proper backend/database
+        console.log('🌐 Public storage initialized');
+    }
+
+    async loadPublicFiles() {
+        try {
+            // Load from "global" localStorage (simulating server data)
+            const publicFiles = localStorage.getItem('publicFileShare');
+            this.files = publicFiles ? JSON.parse(publicFiles) : [];
+            this.renderFileList();
+            this.updateFileCount();
+        } catch (error) {
+            console.error('Failed to load public files:', error);
+            this.files = [];
+        }
+    }
+
+    async savePublicFiles() {
+        try {
+            // Save to "global" localStorage (simulating server save)
+            localStorage.setItem('publicFileShare', JSON.stringify(this.files));
+            console.log(`💾 Saved ${this.files.length} public files`);
+        } catch (error) {
+            console.error('Failed to save public files:', error);
+        }
+    }
+
+    refreshFiles() {
+        console.log('🔄 Refreshing public files...');
+        this.loadPublicFiles();
+    }
+
+    updateFileCount() {
+        this.totalFilesSpan.textContent = this.files.length;
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        this.dropZone.classList.add('dragover');
+    }
+
+    handleDragLeave(e) {
+        e.preventDefault();
+        if (!this.dropZone.contains(e.relatedTarget)) {
+            this.dropZone.classList.remove('dragover');
+        }
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        this.dropZone.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        this.processFiles(files);
+    }
+
+    handleFileSelect(e) {
+        const files = Array.from(e.target.files);
+        this.processFiles(files);
+        this.fileInput.value = '';
+    }
+
+    async processFiles(files) {
+        if (files.length === 0) return;
+
+        this.showUploadProgress();
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // Check file size
+            if (file.size > this.maxFileSize) {
+                alert(`❌ File "${file.name}" is too large. Maximum size is 100MB.`);
+                continue;
+            }
+            
+            const progress = ((i + 1) / files.length) * 100;
+            
+            await this.uploadPublicFile(file);
+            this.updateProgress(progress);
+            
+            // Simulate upload delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        this.hideUploadProgress();
+        this.renderFileList();
+        this.savePublicFiles();
+        this.updateFileCount();
+        
+        // Show success message
+        const uploadedCount = files.length;
+        alert(`🎉 Successfully uploaded ${uploadedCount} file(s) to public storage!\n\n✅ Everyone can now see and download your files.`);
+    }
+
+    async uploadPublicFile(file) {
+        // Generate a random uploader name for demo
+        const uploaderNames = ['Anonymous', 'User123', 'FileSharer', 'Guest', 'Contributor', 'Helper'];
+        const randomUploader = uploaderNames[Math.floor(Math.random() * uploaderNames.length)];
+        
+        const fileData = {
+            id: this.generateId(),
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadDate: new Date().toISOString(),
+            uploader: randomUploader,
+            data: null
+        };
+
+        try {
+            // Store file data as base64 for public access
+            const base64Data = await this.fileToBase64(file);
+            fileData.data = base64Data;
+            
+            console.log(`📤 Uploading "${file.name}" to public storage`);
+        } catch (error) {
+            console.error('Failed to process file:', error);
+            fileData.data = null;
+        }
+
+        this.files.push(fileData);
+    }
+
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    showUploadProgress() {
+        this.uploadProgress.classList.remove('hidden');
+        this.updateProgress(0);
+    }
+
+    hideUploadProgress() {
+        setTimeout(() => {
+            this.uploadProgress.classList.add('hidden');
+        }, 500);
+    }
+
+    updateProgress(percent) {
+        this.progressFill.style.width = `${percent}%`;
+        this.progressText.textContent = `Uploading... ${Math.round(percent)}%`;
+    }
+
+    renderFileList() {
+        if (this.files.length === 0) {
+            this.fileTableBody.innerHTML = '';
+            this.emptyState.classList.remove('hidden');
+            return;
+        }
+
+        this.emptyState.classList.add('hidden');
+        
+        // Sort files by upload date (newest first)
+        const sortedFiles = [...this.files].sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+        
+        this.fileTableBody.innerHTML = sortedFiles.map(file => `
+            <tr>
+                <td data-label="Name">
+                    <strong>${this.escapeHtml(file.name)}</strong>
+                </td>
+                <td data-label="Size">${this.formatFileSize(file.size)}</td>
+                <td data-label="Type">${this.getFileTypeDisplay(file.type)}</td>
+                <td data-label="Uploader">
+                    <span style="color: #3b82f6; font-weight: 500;">${file.uploader || 'Anonymous'}</span>
+                </td>
+                <td data-label="Actions">
+                    <div class="file-actions">
+                        ${this.canPreview(file) ? 
+                            `<button class="btn btn-outline" onclick="publicFileManager.previewFile('${file.id}')">👁️ Preview</button>` : 
+                            ''
+                        }
+                        <button class="btn btn-primary" onclick="publicFileManager.downloadFile('${file.id}')">📥 Download</button>
+                        <button class="btn btn-danger" onclick="publicFileManager.deleteFile('${file.id}')">🗑️ Delete</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    canPreview(file) {
+        const previewableTypes = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf', 'text/plain'
+        ];
+        return previewableTypes.includes(file.type) || file.type.startsWith('image/');
+    }
+
+    previewFile(fileId) {
+        const file = this.files.find(f => f.id === fileId);
+        if (!file) return;
+
+        this.modalTitle.textContent = file.name;
+        this.previewContainer.innerHTML = '';
+
+        if (file.type.startsWith('image/')) {
+            if (file.data) {
+                const img = document.createElement('img');
+                img.src = file.data;
+                img.alt = file.name;
+                this.previewContainer.appendChild(img);
+            } else {
+                this.showPreviewError('Image not available in demo mode');
+            }
+        } else if (file.type === 'application/pdf') {
+            if (file.data) {
+                const iframe = document.createElement('iframe');
+                iframe.src = file.data;
+                iframe.title = file.name;
+                this.previewContainer.appendChild(iframe);
+            } else {
+                this.showPreviewError('PDF not available in demo mode');
+            }
+        } else if (file.type === 'text/plain') {
+            if (file.data) {
+                const pre = document.createElement('pre');
+                pre.style.whiteSpace = 'pre-wrap';
+                pre.style.padding = '1rem';
+                pre.style.background = '#f9fafb';
+                pre.style.borderRadius = '8px';
+                pre.style.fontSize = '0.9rem';
+                pre.textContent = atob(file.data.split(',')[1]);
+                this.previewContainer.appendChild(pre);
+            } else {
+                this.showPreviewError('Text file not available in demo mode');
+            }
+        } else {
+            this.showPreviewError('Preview not available for this file type');
+        }
+
+        this.previewModal.classList.remove('hidden');
+    }
+
+    showPreviewError(message) {
+        this.previewContainer.innerHTML = `
+            <div class="preview-error">
+                <p>${message}</p>
+            </div>
+        `;
+    }
+
+    closeModal() {
+        this.previewModal.classList.add('hidden');
+    }
+
+    downloadFile(fileId) {
+        const file = this.files.find(f => f.id === fileId);
+        if (!file) {
+            alert('❌ File not found!');
+            return;
+        }
+
+        if (file.data) {
+            const link = document.createElement('a');
+            link.href = file.data;
+            link.download = file.name;
+            link.click();
+            
+            console.log(`📥 Downloaded: ${file.name}`);
+        } else {
+            alert('❌ File data not available for download');
+        }
+    }
+
+    deleteFile(fileId) {
+        const file = this.files.find(f => f.id === fileId);
+        if (!file) return;
+        
+        if (confirm(`🗑️ Delete "${file.name}" from public storage?\n\n⚠️ This will remove it for everyone!`)) {
+            this.files = this.files.filter(f => f.id !== fileId);
+            this.renderFileList();
+            this.savePublicFiles();
+            this.updateFileCount();
+            
+            console.log(`🗑️ Deleted from public storage: ${file.name}`);
+        }
+    }
+
+    toggleDemoMode() {
+        this.isDemoMode = !this.isDemoMode;
+        this.updateUI();
+        
+        if (this.isDemoMode) {
+            this.isGoogleDriveConnected = false;
+        }
+    }
+
+    async handleGoogleDrive() {
+        if (this.isGoogleDriveConnected) {
+            // Disconnect
+            this.isGoogleDriveConnected = false;
+            this.isDemoMode = true;
+            this.updateUI();
+        } else {
+            // Connect to Google Drive
+            this.showLoadingOverlay();
+            
+            try {
+                // Simulate Google Drive connection
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // In a real implementation, you would:
+                // 1. Load the Google Drive API
+                // 2. Authenticate the user
+                // 3. Get authorization to access their Drive
+                
+                this.isGoogleDriveConnected = true;
+                this.isDemoMode = false;
+                this.updateUI();
+                
+                alert('Google Drive connected successfully!\n\nNote: This is a demo. In a real implementation, you would integrate with the Google Drive API.');
+            } catch (error) {
+                console.error('Google Drive connection failed:', error);
+                alert('Failed to connect to Google Drive');
+            } finally {
+                this.hideLoadingOverlay();
+            }
+        }
+    }
+
+    showLoadingOverlay() {
+        this.loadingOverlay.classList.remove('hidden');
+    }
+
+    hideLoadingOverlay() {
+        this.loadingOverlay.classList.add('hidden');
+    }
+
+    updateUI() {
+        // Update button states
+        this.demoModeBtn.textContent = this.isDemoMode ? 'Demo Mode (Active)' : 'Demo Mode';
+        this.demoModeBtn.classList.toggle('btn-primary', this.isDemoMode);
+        this.demoModeBtn.classList.toggle('btn-secondary', !this.isDemoMode);
+        
+        this.googleDriveBtn.textContent = this.isGoogleDriveConnected ? 
+            'Disconnect Drive' : 'Connect Google Drive';
+        this.googleDriveBtn.classList.toggle('btn-danger', this.isGoogleDriveConnected);
+        this.googleDriveBtn.classList.toggle('btn-primary', !this.isGoogleDriveConnected);
+    }
+
+    // Utility functions
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    getFileTypeDisplay(mimeType) {
+        if (!mimeType) return 'Unknown';
+        
+        const typeMap = {
+            'image/jpeg': 'JPEG Image',
+            'image/jpg': 'JPG Image',
+            'image/png': 'PNG Image',
+            'image/gif': 'GIF Image',
+            'image/webp': 'WebP Image',
+            'application/pdf': 'PDF Document',
+            'text/plain': 'Text File',
+            'text/html': 'HTML File',
+            'text/css': 'CSS File',
+            'text/javascript': 'JavaScript File',
+            'application/json': 'JSON File',
+            'application/zip': 'ZIP Archive',
+            'application/x-rar-compressed': 'RAR Archive',
+            'video/mp4': 'MP4 Video',
+            'video/avi': 'AVI Video',
+            'audio/mp3': 'MP3 Audio',
+            'audio/wav': 'WAV Audio',
+            'application/msword': 'Word Document',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word Document',
+            'application/vnd.ms-excel': 'Excel Spreadsheet',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel Spreadsheet'
+        };
+
+        return typeMap[mimeType] || mimeType.split('/')[1]?.toUpperCase() || 'Unknown';
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Google Drive Integration Helper Functions
+class GoogleDriveIntegration {
+    constructor() {
+        this.isLoaded = false;
+        this.isAuthenticated = false;
+        this.gapi = null;
+    }
+
+    async initialize() {
+        // Load Google API script
+        if (!window.gapi) {
+            await this.loadScript('https://apis.google.com/js/api.js');
+        }
+        
+        this.gapi = window.gapi;
+        
+        // Initialize the API
+        await new Promise((resolve) => {
+            this.gapi.load('client:auth2', resolve);
+        });
+
+        await this.gapi.client.init({
+            apiKey: 'YOUR_API_KEY', // Replace with your API key
+            clientId: 'YOUR_CLIENT_ID', // Replace with your client ID
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+            scope: 'https://www.googleapis.com/auth/drive.file'
+        });
+
+        this.isLoaded = true;
+    }
+
+    loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    async authenticate() {
+        if (!this.isLoaded) {
+            await this.initialize();
+        }
+
+        const authInstance = this.gapi.auth2.getAuthInstance();
+        
+        if (!authInstance.isSignedIn.get()) {
+            await authInstance.signIn();
+        }
+        
+        this.isAuthenticated = true;
+        return true;
+    }
+
+    async uploadFile(file) {
+        if (!this.isAuthenticated) {
+            throw new Error('Not authenticated with Google Drive');
+        }
+
+        const metadata = {
+            name: file.name,
+            parents: ['YOUR_FOLDER_ID'] // Optional: specify a folder
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+        form.append('file', file);
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: new Headers({
+                'Authorization': `Bearer ${this.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token}`
+            }),
+            body: form
+        });
+
+        return response.json();
+    }
+
+    async listFiles() {
+        if (!this.isAuthenticated) {
+            throw new Error('Not authenticated with Google Drive');
+        }
+
+        const response = await this.gapi.client.drive.files.list({
+            pageSize: 100,
+            fields: 'nextPageToken, files(id, name, size, mimeType, createdTime)'
+        });
+
+        return response.result.files;
+    }
+
+    async downloadFile(fileId) {
+        if (!this.isAuthenticated) {
+            throw new Error('Not authenticated with Google Drive');
+        }
+
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+            headers: {
+                'Authorization': `Bearer ${this.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token}`
+            }
+        });
+
+        return response.blob();
+    }
+
+    async deleteFile(fileId) {
+        if (!this.isAuthenticated) {
+            throw new Error('Not authenticated with Google Drive');
+        }
+
+        await this.gapi.client.drive.files.delete({
+            fileId: fileId
+        });
+    }
+}
+
+// Initialize the public file sharing application
+let publicFileManager;
+
+document.addEventListener('DOMContentLoaded', () => {
+    publicFileManager = new PublicFileManager();
+    console.log('🌐 Public File Sharing Platform initialized!');
+    console.log('📢 Anyone can upload and download files here');
+});
+
+// Export for global access (needed for onclick handlers)
+window.publicFileManager = publicFileManager;
     </script>
+    <script src="app.js"></script>
 </body>
 </html>
